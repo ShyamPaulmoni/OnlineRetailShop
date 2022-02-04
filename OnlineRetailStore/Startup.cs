@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OnlineRetailStore.Context;
 using OnlineRetailStore.Models.Interfaces;
 using OnlineRetailStore.Repository;
@@ -32,8 +32,12 @@ namespace OnlineRetailStore
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OnlineRetailStore", Version = "v1" });
             });
 
-            services.AddDbContext<OnlineRetailStoreContext>(x => x.UseSqlServer(Configuration.GetConnectionString("ConStr")));
-            services.AddScoped<DbContext, OnlineRetailStoreContext>();
+            services.Configure<OnlineRetailStoreDatabaseSettings>(
+                Configuration.GetSection("OnlineRetailStoreDatabase"));
+
+            services.AddScoped<IOnlineRetailShopDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<OnlineRetailStoreDatabaseSettings>>().Value);
+
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductServices, ProductServices>();

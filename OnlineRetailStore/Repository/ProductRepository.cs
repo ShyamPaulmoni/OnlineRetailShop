@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using OnlineRetailStore.Context;
 using OnlineRetailStore.Models;
 using OnlineRetailStore.Repository.Interfaces;
 
@@ -8,39 +10,40 @@ namespace OnlineRetailStore.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly DbContext _dbContext;
+        private readonly IMongoCollection<Product> _products;
 
-        public ProductRepository(DbContext dbContext)
+        public ProductRepository(IOnlineRetailShopDatabaseSettings dbSettings)
         {
-            _dbContext = dbContext;
+            var client = new MongoClient(dbSettings.ConnectionString);
+
+            var database = client.GetDatabase(dbSettings.DatabaseName);
+
+            _products = database.GetCollection<Product>(dbSettings.ProductsCollectionName);
         }
         
         public void Add(Product product)
         {
-            _dbContext.Add(product);
-            _dbContext.SaveChanges();
+            _products.InsertOne(product);
         }
 
         public void Update(Product product)
         {
-            _dbContext.Update(product);
-            _dbContext.SaveChanges();
+            _products.ReplaceOne(pro => pro.Id == product.Id, product);
         }
 
         public void Delete(Product product)
         {
-            _dbContext.Remove(product);
-            _dbContext.SaveChanges();
+            _products.DeleteOne(pro => pro.Id == product.Id);
         }
 
         Product IProductRepository.Get(int id)
         {
-            return _dbContext.Find<Product>(id);
+            return _products.Find(pro => pro.ItemId == id).FirstOrDefault();
         }
 
         List<Product> IProductRepository.GetAll()
         {
-            return _dbContext.Set<Product>().ToList();
+            return _products.Find(pro => true).ToList();
         }
     }
 }
