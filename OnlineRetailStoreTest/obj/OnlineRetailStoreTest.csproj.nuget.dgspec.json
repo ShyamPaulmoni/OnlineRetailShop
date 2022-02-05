@@ -55,10 +55,6 @@
               "target": "Package",
               "version": "[16.9.4, )"
             },
-            "MongoDB.Driver": {
-              "target": "Package",
-              "version": "[2.14.1, )"
-            },
             "Moq": {
               "target": "Package",
               "version": "[4.16.1, )"
@@ -138,10 +134,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[5.0.13, )"
-            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
